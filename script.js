@@ -1,7 +1,11 @@
 "use strict";
 
 const gameboard = (() => {
-    let board = [null, null, null, null, null, null, null, null, null];
+    let board = [
+        null, null, null,
+        null, null, null,
+        null, null, null
+    ];
 
     const changeBoard = (player, index) => {
         board[index] = player.getMarker();
@@ -11,7 +15,15 @@ const gameboard = (() => {
         return board;
     };
 
-    return { changeBoard, getBoard };
+    const reset = () => {
+        board = [
+            null, null, null,
+            null, null, null,
+            null, null, null
+        ];
+    };
+
+    return { changeBoard, getBoard, reset };
 })();
 
 const Player = (name, marker) => {
@@ -88,13 +100,18 @@ const gameController = (() => {
         }
     };
 
-    const makeMove = (index) => {
-        if (!winner && !tie && checkIfValidMove(index)) {
+    const makeMove = (index) => { // TODO: séparer en sous-fonctions
+        if (!winner &&
+            !tie &&
+            checkIfValidMove(index)) {
             gameboard.changeBoard(currentPlayer, index);
             checkWinner();
             checkTie();
             changeTurn();
             display.render();
+            if (winner || tie) {
+                display.displayResetBtn();
+            }
         }
     };
 
@@ -102,12 +119,25 @@ const gameController = (() => {
         return currentPlayer;
     };
 
-    return { initialize, makeMove, getCurrentPlayer };
+    const reset = () => {
+        winner = null;
+        tie = false;
+        gameboard.reset();
+        display.render();
+        display.displayResetBtn();
+    };
+
+    return { initialize, makeMove, getCurrentPlayer, reset };
 })();
 
 const display = (() => {
     const [...cells] = document.querySelectorAll(".cell");
     const currentPlayerEl = document.querySelector("h2 span");
+    const resetBtnEl = document.querySelector("button");
+
+    const displayResetBtn = () => {
+        resetBtnEl.classList.toggle("hidden");
+    };
 
     const handleClick = (clickedCell) => {
         gameController.makeMove(clickedCell.dataset.index);
@@ -118,9 +148,9 @@ const display = (() => {
             cell.textContent = gameboard.getBoard()[cell.dataset.index];
         });
 
-        currentPlayerEl.textContent = `${gameController
-            .getCurrentPlayer()
-            .getName()} (${gameController.getCurrentPlayer().getMarker()})`;
+        currentPlayerEl.textContent = `
+        ${gameController.getCurrentPlayer().getName()} 
+        (${gameController.getCurrentPlayer().getMarker()})`;
     };
 
     const initialize = () => {
@@ -130,10 +160,14 @@ const display = (() => {
             });
         });
 
+        resetBtnEl.addEventListener("click", () => {
+            gameController.reset();
+        });
+
         render();
     };
 
-    return { render, initialize };
+    return { render, initialize, displayResetBtn };
 })();
 
 const playerOne = Player("Lux", "X");
