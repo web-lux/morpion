@@ -1,21 +1,17 @@
 "use strict";
 
 const gameboard = (() => {
-    let board = [
-        null, null, null,
-        null, null, null,
-        null, null, null
-    ];
+    let board = [null, null, null, null, null, null, null, null, null];
 
     const changeBoard = (player, index) => {
         board[index] = player.getMarker();
-    }
+    };
 
     const getBoard = () => {
-        return board
-    }
+        return board;
+    };
 
-    return { changeBoard, getBoard }
+    return { changeBoard, getBoard };
 })();
 
 const Player = (name, marker) => {
@@ -24,14 +20,13 @@ const Player = (name, marker) => {
     };
 
     const getMarker = () => {
-        return marker
-    }
+        return marker;
+    };
 
-    return { getName, getMarker }
+    return { getName, getMarker };
 };
 
 const gameController = (() => {
-
     const winningCombinations = [
         // Rows
         [0, 1, 2],
@@ -43,7 +38,7 @@ const gameController = (() => {
         [2, 5, 8],
         // Diagonals
         [0, 4, 8],
-        [2, 4, 6]
+        [2, 4, 6],
     ];
 
     let currentPlayer = null;
@@ -51,12 +46,12 @@ const gameController = (() => {
     let tie = false;
 
     const changeTurn = () => {
-        currentPlayer = (currentPlayer === playerOne) ? playerTwo : playerOne;
-    }
+        currentPlayer = currentPlayer === playerOne ? playerTwo : playerOne;
+    };
 
     const initialize = () => {
         currentPlayer = playerOne;
-    }
+    };
 
     const checkIfValidMove = (move) => {
         if (
@@ -64,14 +59,13 @@ const gameController = (() => {
             gameboard.getBoard()[move] === playerTwo.getMarker()
         ) {
             alert("Case déjà utilisée par un joueur !");
-            return false
+            return false;
         } else {
-            return true
+            return true;
         }
-    }
+    };
 
     const checkWinner = () => {
-
         for (const combination of winningCombinations) {
             const [a, b, c] = combination;
 
@@ -81,74 +75,65 @@ const gameController = (() => {
                 gameboard.getBoard()[a] === gameboard.getBoard()[c]
             ) {
                 winner = currentPlayer;
-                alert(`Gagnant : ${winner.getName()}`)
+                alert(`Gagnant : ${winner.getName()}`);
             }
-
         }
-
-    }
+    };
 
     const checkTie = () => {
         const isNotNull = (value) => value !== null;
         if (gameboard.getBoard().every(isNotNull)) {
             tie = true;
-            alert("Égalité !")
+            alert("Égalité !");
         }
-    }
+    };
 
     const makeMove = (index) => {
-        if (
-            !winner &&
-            !tie &&
-            checkIfValidMove(index)
-        ) {
+        if (!winner && !tie && checkIfValidMove(index)) {
             gameboard.changeBoard(currentPlayer, index);
             checkWinner();
             checkTie();
             changeTurn();
             display.render();
         }
-    }
+    };
 
     const getCurrentPlayer = () => {
-        return currentPlayer
-    }
+        return currentPlayer;
+    };
 
-    return { initialize, makeMove, getCurrentPlayer }
-
+    return { initialize, makeMove, getCurrentPlayer };
 })();
 
 const display = (() => {
-
     const [...cells] = document.querySelectorAll(".cell");
     const currentPlayerEl = document.querySelector("h2 span");
 
     const handleClick = (clickedCell) => {
         gameController.makeMove(clickedCell.dataset.index);
-    }
+    };
 
     const render = () => {
         cells.forEach((cell) => {
             cell.textContent = gameboard.getBoard()[cell.dataset.index];
-        })
+        });
 
-        currentPlayerEl.textContent = `${gameController.getCurrentPlayer().getName()} (${gameController.getCurrentPlayer().getMarker()})`;
-
-    }
+        currentPlayerEl.textContent = `${gameController
+            .getCurrentPlayer()
+            .getName()} (${gameController.getCurrentPlayer().getMarker()})`;
+    };
 
     const initialize = () => {
         cells.forEach((cell) => {
-
             cell.addEventListener("click", (event) => {
                 handleClick(event.target);
             });
-
         });
 
         render();
-    }
+    };
 
-    return { render, initialize }
+    return { render, initialize };
 })();
 
 const playerOne = Player("Lux", "X");
