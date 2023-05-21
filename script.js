@@ -115,20 +115,29 @@ const gameController = (() => {
         }
     };
 
-    const makeMove = (index) => { // TODO: séparer en sous-fonctions
+    const makeMove = (index) => {
+        gameboard.changeBoard(currentPlayer, index);
+    };
+
+    const playRound = (index) => {
         if (!winner &&
             !tie &&
             checkIfValidMove(index)) {
-            gameboard.changeBoard(currentPlayer, index);
-            checkWinner();
-            checkTie();
+            makeMove(index);
+            checkGameStatus();
             changeTurn();
             display.render();
+
             if (winner || tie) {
                 display.displayResetBtn();
             }
         }
-    };
+    }
+
+    const checkGameStatus = () => {
+        checkWinner();
+        checkTie();
+    }
 
     const getCurrentPlayer = () => {
         return currentPlayer;
@@ -142,7 +151,7 @@ const gameController = (() => {
         display.displayResetBtn();
     };
 
-    return { initialize, makeMove, getCurrentPlayer, reset };
+    return { initialize, playRound, getCurrentPlayer, reset };
 })();
 
 const display = (() => {
@@ -159,7 +168,7 @@ const display = (() => {
     };
 
     const handleClick = (clickedCell) => {
-        gameController.makeMove(clickedCell.dataset.index);
+        gameController.playRound(clickedCell.dataset.index);
     };
 
     const render = () => {
