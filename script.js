@@ -91,6 +91,12 @@ const gameController = (() => {
         }
     };
 
+    const checkGameWinner = () => {
+        if (winner.getScore() >= 3) {
+            alert(`${winner.getName()} est le grand vainqueur du jeu ! 🎊`)
+        }
+    }
+
     const checkWinner = () => {
         for (const combination of winningCombinations) {
             const [a, b, c] = combination;
@@ -101,8 +107,9 @@ const gameController = (() => {
                 gameboard.getBoard()[a] === gameboard.getBoard()[c]
             ) {
                 winner = currentPlayer;
-                alert(`Gagnant : ${winner.getName()}`);
+                alert(`${winner.getName()} a gagné ce round !`);
                 winner.incrementScore();
+                checkGameWinner();
             }
         }
     };
@@ -144,6 +151,11 @@ const gameController = (() => {
     };
 
     const reset = () => {
+        if (winner.getScore() >= 3) {
+            playerOne.resetScore();
+            playerTwo.resetScore();
+        }
+
         winner = null;
         tie = false;
         gameboard.reset();
