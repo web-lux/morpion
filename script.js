@@ -27,6 +27,8 @@ const gameboard = (() => {
 })();
 
 const Player = (name, marker) => {
+    let score = 0;
+
     const getName = () => {
         return name;
     };
@@ -35,7 +37,19 @@ const Player = (name, marker) => {
         return marker;
     };
 
-    return { getName, getMarker };
+    const getScore = () => {
+        return score;
+    }
+
+    const incrementScore = () => {
+        score++;
+    }
+
+    const resetScore = () => {
+        score = 0;
+    }
+
+    return { getName, getMarker, getScore, incrementScore, resetScore };
 };
 
 const gameController = (() => {
@@ -88,6 +102,7 @@ const gameController = (() => {
             ) {
                 winner = currentPlayer;
                 alert(`Gagnant : ${winner.getName()}`);
+                winner.incrementScore();
             }
         }
     };
@@ -133,7 +148,11 @@ const gameController = (() => {
 const display = (() => {
     const [...cells] = document.querySelectorAll(".cell");
     const currentPlayerEl = document.querySelector("h2 span");
-    const resetBtnEl = document.querySelector("button");
+    const resetBtnEl = document.querySelector("button");;
+    const playerOneNameEl = document.querySelector("#player-1-name");
+    const playerTwoNameEl = document.querySelector("#player-2-name");
+    const playerOneScoreEl = document.querySelector("#player-1-score");
+    const playerTwoScoreEl = document.querySelector("#player-2-score");
 
     const displayResetBtn = () => {
         resetBtnEl.classList.toggle("hidden");
@@ -151,6 +170,12 @@ const display = (() => {
         currentPlayerEl.textContent = `
         ${gameController.getCurrentPlayer().getName()} 
         (${gameController.getCurrentPlayer().getMarker()})`;
+
+        playerOneNameEl.textContent = playerOne.getName();
+        playerTwoNameEl.textContent = playerTwo.getName();
+
+        playerOneScoreEl.textContent = playerOne.getScore();
+        playerTwoScoreEl.textContent = playerTwo.getScore();
     };
 
     const initialize = () => {
