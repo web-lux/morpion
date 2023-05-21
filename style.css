@@ -1,0 +1,28 @@
+h1,
+h2,
+ul {
+	text-align: center;
+}
+
+ul {
+	list-style-type: none;
+}
+
+.tic-tac-toe {
+	display: flex;
+	flex-direction: column;
+}
+
+.row {
+	display: flex;
+	justify-content: center;
+}
+
+.cell {
+	width: 100px;
+	height: 100px;
+	border: 1px solid black;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+}

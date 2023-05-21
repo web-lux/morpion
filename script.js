@@ -54,28 +54,8 @@ const gameController = (() => {
         currentPlayer = (currentPlayer === playerOne) ? playerTwo : playerOne;
     }
 
-    const initializeGame = () => {
+    const initialize = () => {
         currentPlayer = playerOne;
-        playGame();
-    }
-
-    const playGame = () => {
-        while (winner === null && tie === false) {
-            gameboard.changeBoard(currentPlayer, getMove());
-            console.log(gameboard.getBoard());
-            checkWinner();
-            checkTie();
-            changeTurn();
-        }
-    }
-
-    const getMove = () => {
-        let move = prompt("À quel index souhaitez vous apposer votre marque ?");
-        if (checkIfValidMove(move)) {
-            return move
-        } else {
-            getMove();
-        }
     }
 
     const checkIfValidMove = (move) => {
@@ -83,11 +63,7 @@ const gameController = (() => {
             gameboard.getBoard()[move] === playerOne.getMarker() ||
             gameboard.getBoard()[move] === playerTwo.getMarker()
         ) {
-            alert("Case déjà utilisée par un joueur ! Voir console.");
-            console.warn(gameboard.getBoard());
-            return false
-        } else if (gameboard.getBoard()[move] === undefined) {
-            alert("Merci d'entrer un index entre 0 et 8 !")
+            alert("Case déjà utilisée par un joueur !");
             return false
         } else {
             return true
@@ -105,7 +81,7 @@ const gameController = (() => {
                 gameboard.getBoard()[a] === gameboard.getBoard()[c]
             ) {
                 winner = currentPlayer;
-                console.log(`Gagnant : ${winner.getName()}`)
+                alert(`Gagnant : ${winner.getName()}`)
             }
 
         }
@@ -116,14 +92,66 @@ const gameController = (() => {
         const isNotNull = (value) => value !== null;
         if (gameboard.getBoard().every(isNotNull)) {
             tie = true;
-            alert("It's a tie !")
+            alert("Égalité !")
         }
     }
 
-    return { initializeGame }
+    const makeMove = (index) => {
+        if (
+            !winner &&
+            !tie &&
+            checkIfValidMove(index)
+        ) {
+            gameboard.changeBoard(currentPlayer, index);
+            checkWinner();
+            checkTie();
+            changeTurn();
+            display.render();
+        }
+    }
 
+    const getCurrentPlayer = () => {
+        return currentPlayer
+    }
+
+    return { initialize, makeMove, getCurrentPlayer }
+
+})();
+
+const display = (() => {
+
+    const [...cells] = document.querySelectorAll(".cell");
+    const currentPlayerEl = document.querySelector("h2 span");
+
+    const handleClick = (clickedCell) => {
+        gameController.makeMove(clickedCell.dataset.index);
+    }
+
+    const render = () => {
+        cells.forEach((cell) => {
+            cell.textContent = gameboard.getBoard()[cell.dataset.index];
+        })
+
+        currentPlayerEl.textContent = `${gameController.getCurrentPlayer().getName()} (${gameController.getCurrentPlayer().getMarker()})`;
+
+    }
+
+    const initialize = () => {
+        cells.forEach((cell) => {
+
+            cell.addEventListener("click", (event) => {
+                handleClick(event.target);
+            });
+
+        });
+
+        render();
+    }
+
+    return { render, initialize }
 })();
 
 const playerOne = Player("Lux", "X");
 const playerTwo = Player("Computer", "O");
-gameController.initializeGame();
+gameController.initialize();
+display.initialize();
